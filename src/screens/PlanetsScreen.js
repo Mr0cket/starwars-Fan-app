@@ -40,7 +40,7 @@ export default function PlanetsScreen() {
       <View style={{ alignItems: "center" }}>
         <View style={{ flexDirection: "row", marginTop: height / 10 }}>
           <View>
-            <H2>Climate</H2>
+            <H2 style={{ fontFamily: "StarWars" }}>Climate</H2>
             <Picker
               note
               renderHeader="Climate"
@@ -56,7 +56,7 @@ export default function PlanetsScreen() {
             </Picker>
           </View>
           <View>
-            <H2>hair Type</H2>
+            <H2 style={{ fontFamily: "StarWars" }}>hair Type</H2>
             <Picker
               note
               renderHeader="hair-type"
@@ -73,7 +73,7 @@ export default function PlanetsScreen() {
           </View>
         </View>
         <View style={{ width, marginTop: height / 20 }}>
-          {!climate && <H2> Choose a climate type!</H2>}
+          {!climate && <H2 style={{ fontFamily: "StarWars" }}> Choose a climate type!</H2>}
           {loading ? <ActivityIndicator /> : planetsList}
         </View>
       </View>
