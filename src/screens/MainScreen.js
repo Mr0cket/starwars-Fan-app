@@ -31,12 +31,8 @@ export default function MainScreen({ navigation }) {
         style={{ alignSelf: "center", marginTop: height / 5 }}
         onPress={() => navigation.push("planets")}
       >
-        <Text>Characters By Planet (By Climate)</Text>
+        <Text>Characters By Planet (filtered By Climate)</Text>
       </Button>
-      <TouchableOpacity style={styles.button} onPress={() => navigation.push("planets")}>
-        <Text style={{ color: "white", fontFamily: "Roboto_medium" }}>Characters By Planet </Text>
-        <Text style={styles.fineText}>(By Climate)</Text>
-      </TouchableOpacity>
     </Container>
   );
 }
