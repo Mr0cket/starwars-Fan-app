@@ -4,34 +4,40 @@ import { ActivityIndicator, Dimensions, ScrollView, StyleSheet } from "react-nat
 import axios from "axios";
 import Accordion from "../components/Accordion";
 import { apiUrl } from "../config/constants";
+import CharacterItem from "../components/CharacterItem";
 const { height, width } = Dimensions.get("window");
 
 const climates = ["arid", "tropical", "temperate", "windy", "polluted", "moist", "hot", "unknown"];
 
 export default function PlanetsScreen() {
-  const [{ climate, data, loading, hairType }, setScreenState] = useState({
-    climate: null,
-    planets: null,
+  const [{ data, loading }, setScreenState] = useState({
+    data: null,
     loading: null,
-    hairType: false,
   });
+  const [hairType, setHairType] = useState(false);
+  const [climate, setClimate] = useState(null);
 
   useEffect(() => {
-    climate
-      ? axios
-          .get(`${apiUrl}/planets/climate/${climate}`)
-          .then((res) => setScreenState((prevState) => ({ ...prevState, data: res.data })))
-      : setScreenState((prevState) => ({ ...prevState, data: null }));
+    if (climate) {
+      setScreenState((prevState) => ({ ...prevState, loading: true }));
+      axios
+        .get(`${apiUrl}/planets/climate/${climate}`)
+        .then((res) =>
+          setScreenState((prevState) => ({ ...prevState, data: res.data, loading: null }))
+        );
+    } else setScreenState((prevState) => ({ ...prevState, data: null }));
   }, [climate]);
 
   const residentType = hairType ? "darkHairedResidents" : "residents";
   const planetsList =
     data &&
     Object.values(data).map((planet) => (
-      <Accordion title={planet.name}>
+      <Accordion key={planet.name} title={planet.name}>
         <Body>
           {planet[residentType].length > 0 ? (
-            planet[residentType].map((resident) => <Text>{resident.name}</Text>)
+            planet[residentType].map((resident) => (
+              <CharacterItem key={resident.name} character={resident} />
+            ))
           ) : (
             <Text>no {residentType}</Text>
           )}
@@ -49,9 +55,7 @@ export default function PlanetsScreen() {
             mode="dropdown"
             style={{ width: width / 2, color: "black", fontSize: 18 }}
             selectedValue={climate}
-            onValueChange={(value) =>
-              setScreenState((prevState) => ({ ...prevState, climate: value }))
-            }
+            onValueChange={setClimate}
           >
             <Picker.Item key={0} label="none" value={undefined} />
             {climates.map((climate, i) => (
@@ -67,9 +71,7 @@ export default function PlanetsScreen() {
             mode="dropdown"
             style={{ width: width / 2, color: "black", fontSize: 18 }}
             selectedValue={hairType}
-            onValueChange={(value) =>
-              setScreenState((prevState) => ({ ...prevState, hairType: value }))
-            }
+            onValueChange={setHairType}
           >
             <Picker.Item key={0} label="all" value={false} />
             <Picker.Item key={0} label="Dark Haired" value={true} />
@@ -78,7 +80,7 @@ export default function PlanetsScreen() {
       </View>
       <ScrollView style={{ width, marginTop: height / 20 }}>
         {!climate && <H2 style={{ fontFamily: "StarWars" }}> Choose a climate type!</H2>}
-        {loading ? <ActivityIndicator /> : planetsList}
+        {loading ? <ActivityIndicator size="large" color="green" /> : planetsList}
       </ScrollView>
     </Container>
   );
