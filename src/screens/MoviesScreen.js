@@ -1,9 +1,10 @@
 import axios from "axios";
 import AppLoading from "expo-app-loading";
-import { Body, Button, Container, Form, H3, Input, Item, Label, Picker } from "native-base";
+import { Body, Button, Col, Container, Form, H3, Input, Item, Label, Picker } from "native-base";
 import React, { useState } from "react";
-import { View, Text, StyleSheet, Dimensions, ScrollView } from "react-native";
+import { View, Text, StyleSheet, Dimensions, ScrollView, ActivityIndicator } from "react-native";
 import Accordion from "../components/Accordion";
+import CharacterItem from "../components/CharacterItem";
 import RadioButton from "../components/RadioButton";
 import { apiUrl } from "../config/constants";
 
@@ -18,7 +19,6 @@ export default function MoviesScreen() {
     loading: null,
     error: null,
   });
-
   const searchForMovie = async () => {
     setScreenState((screenState) => ({ ...screenState, loading: true }));
     const filter = !gender ? "" : `&gender=${gender.toLowerCase()}`;
@@ -26,49 +26,48 @@ export default function MoviesScreen() {
     const searchString = `${apiUrl}/characters?title=${searchTitle}${sortby}${filter}`;
     try {
       const res = await axios.get(searchString);
-      console.log(res);
       if (res.data) {
-        setScreenState((state) => ({ ...state, data: res.data }));
+        if (res.data.message)
+          return setScreenState((state) => ({
+            ...state,
+            error: res.data.message,
+            data: null,
+            loading: null,
+          }));
+        setScreenState((state) => ({ ...state, data: res.data, loading: null }));
       }
     } catch (e) {
       console.log(e.response.data.message);
-      setScreenState((screenState) => ({ ...screenState, error: e.response.data.message }));
+      setScreenState((screenState) => ({
+        ...screenState,
+        error: e.response.data.message,
+        loading: null,
+      }));
     }
   };
+
+  const searchBtnState = searchTitle.length < 1;
+
   const results =
     data &&
     data.characters &&
     data.characters.map((character) => (
-      <Accordion key={character.name} title={character.name}>
-        <Body>
-          <Text style={{ fontFamily: "StarWars" }}>Birth Year: {character.birth_year}</Text>
-          <Text style={{ fontFamily: "StarWars" }}>Height: {character.height}</Text>
-          <Text style={{ fontFamily: "StarWars" }}>gender: {character.gender}</Text>
-          <Text style={{ fontFamily: "StarWars" }}>skin: {character.skin_color}</Text>
-          <Text style={{ fontFamily: "StarWars" }}>eyes: {character.eye_color}</Text>
-          <Text style={{ fontFamily: "StarWars" }}>hair: {character.hair_color}</Text>
-        </Body>
-      </Accordion>
+      <CharacterItem key={character.name} character={character} />
     ));
 
-  const context = data && `characters from films: ${data?.matchedMovies.join(", ")}.`;
+  const screenContext =
+    data && !error ? `characters from films: ${data.matchedMovies.join(", ")}.` : error;
   return (
     <Container>
       <Form>
         <Item style={{ marginTop: 20 }} rounded floatingLabel>
           <Label style={{ marginBottom: 20 }}>Movie Title</Label>
-          <Input onChangeText={setTitle} onEndEditing={setTitle} />
+          <Input onChangeText={setTitle} onEndEditing={searchForMovie} />
         </Item>
       </Form>
 
       <View style={styles.main}>
-        <View
-          style={{
-            flexDirection: "row",
-            width: "100%",
-            justifyContent: "space-between",
-          }}
-        >
+        <View style={styles.row}>
           <View>
             <H3>Gender</H3>
             <View style={{ flexDirection: "row" }}>
@@ -93,14 +92,23 @@ export default function MoviesScreen() {
             </Picker>
           </View>
         </View>
-        <Text>{context && context}</Text>
-        <Button style={styles.button} onPress={searchForMovie}>
-          <Text style={styles.buttonText}>Search</Text>
-        </Button>
-        <ScrollView>
-          {loading ? <AppLoading /> : error && <Text>{error}</Text>}
-          {results}
-        </ScrollView>
+        <View style={styles.row}>
+          <Col>
+            <Text>{screenContext && screenContext}</Text>
+          </Col>
+          <Col>
+            <Button style={styles.button} onPress={searchForMovie} disabled={searchBtnState}>
+              <Text style={styles.buttonText}>Search</Text>
+            </Button>
+          </Col>
+        </View>
+        {loading ? (
+          <View style={{ height: "70%", justifyContent: "center", overflow: "hidden" }}>
+            <ActivityIndicator color="green" size="large" />
+          </View>
+        ) : (
+          <ScrollView>{results}</ScrollView>
+        )}
       </View>
     </Container>
   );
@@ -125,5 +133,10 @@ const styles = StyleSheet.create({
   },
   content: {
     alignItems: "center",
+  },
+  row: {
+    flexDirection: "row",
+    width: "100%",
+    justifyContent: "space-between",
   },
 });
