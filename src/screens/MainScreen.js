@@ -1,23 +1,42 @@
 import { Container, Text, Button } from "native-base";
 import React from "react";
-import { Dimensions, StyleSheet } from "react-native";
+import { Dimensions, StyleSheet, TouchableOpacity } from "react-native";
 const { height, width } = Dimensions.get("window");
 
 export default function MainScreen({ navigation }) {
   return (
     <Container style={styles.container}>
       <Text
-        style={{ fontFamily: "StarWars", fontSize: 40, color: "black", marginTop: height / 10 }}
+        style={{
+          fontFamily: "StarWars",
+          fontSize: 40,
+          color: "black",
+          marginTop: height / 10,
+          alignItems: "center",
+        }}
       >
-        StarWars
+        swinder
       </Text>
-      <Text style={{ fontFamily: "StarWars", fontSize: 40, color: "black" }}>Fan Page</Text>
+      <Text style={{ fontFamily: "StarWars", fontSize: 18, color: "black" }}>
+        Find your perfect match in a galaxy far, far away...
+      </Text>
+      <Button
+        style={{ alignSelf: "center", marginTop: height / 5 }}
+        onPress={() => navigation.push("movies")}
+      >
+        <Text>Characters By Movie</Text>
+      </Button>
+
       <Button
         style={{ alignSelf: "center", marginTop: height / 5 }}
         onPress={() => navigation.push("planets")}
       >
-        <Text>Planets By Climate</Text>
+        <Text>Characters By Planet (By Climate)</Text>
       </Button>
+      <TouchableOpacity style={styles.button} onPress={() => navigation.push("planets")}>
+        <Text style={{ color: "white", fontFamily: "Roboto_medium" }}>Characters By Planet </Text>
+        <Text style={styles.fineText}>(By Climate)</Text>
+      </TouchableOpacity>
     </Container>
   );
 }
@@ -27,5 +46,20 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     alignItems: "center",
+  },
+  fineText: {
+    fontSize: 10,
+    color: "white",
+    fontFamily: "Roboto_medium",
+  },
+  button: {
+    alignSelf: "center",
+    marginTop: height / 5,
+    paddingHorizontal: 20,
+    backgroundColor: "blue",
+    borderRadius: 2,
+    elevation: 2,
+    alignItems: "center",
+    paddingVertical: 10,
   },
 });

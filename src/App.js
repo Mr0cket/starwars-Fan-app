@@ -6,6 +6,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import MainScreen from "./screens/MainScreen";
 import PlanetsScreen from "./screens/PlanetsScreen";
+import MoviesScreen from "./screens/MoviesScreen";
 const Stack = createStackNavigator();
 
 export default class App extends React.Component {
@@ -38,6 +39,7 @@ export default class App extends React.Component {
         <Stack.Navigator>
           <Stack.Screen options={{ headerShown: false }} name="Home" component={MainScreen} />
           <Stack.Screen name="planets" component={PlanetsScreen} />
+          <Stack.Screen name="movies" component={MoviesScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     );
